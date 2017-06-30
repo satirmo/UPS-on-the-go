@@ -194,15 +194,65 @@ def base64ToMat( input, id ) :
 
     return cv2.imread( imgname );
 
+def cropImage( img ) :
+    '''cv2.imshow('init',img);
+    cv2.waitKey(0);
+    cv2.destroyAllWindows();'''
+
+    l = 0;
+
+    # print( "calculating l" );
+
+    for i in range( len( img[ 0 ] ) ) :
+        flag = True;
+
+        for j in range( len( img ) ) :
+            # print( img[ j ][ i ] );
+            if not np.array_equal( img[ j ][ i ], [ 0, 0, 0 ] ) :
+                flag = False;
+
+        if flag == False :
+            l = i;
+            break;
+
+
+    # print( "calculating r" );
+    r = len( img[ 0 ] ) - 1;
+
+    while r > 0 :
+        flag = True;
+
+        for j in range( len( img ) ) :
+            if not np.array_equal( img[ j ][ r ], [ 0, 0, 0 ] ) :
+                flag = False;
+
+        if flag == False :
+            break;
+
+        r -= 1;
+
+    y = 0;
+    h = len( img ) - 1;
+
+    x = l;
+    w = r - l - 1;
+
+    print( 0, len( img[ 0 ] )-1, "--->", l, r );
+
+    return img[ y : y + h, x : x + w ];
+
 def findSmallestBox( imgs ) :
-    knownDimensions = 0; # update as necessary
+    for i in range( len( imgs ) ) :
+        imgs[ i ] = cropImage( imgs[ i ] );
+
+    knownDimensionsId = 0; # update as necessary
 
     print( "creating 3d model..." );
     objDims = create3DModel( imgs, knownDimensionsId );
     print( "3d model created..." );
 
     boxDims = [ ( 2, 11, 13 ), ( 3, 11, 16 ), ( 3, 13, 18 ) ];
-    retChar = [ 's', 'm', 'l' ];
+    retChar = [ 'S', 'M', 'L' ];
 
     for i in range( 3 ) :
         if fitsInBox( objDims, boxDims[ i ] ) :
@@ -235,5 +285,5 @@ if __name__ == "__main__" :
         res = cv2.resize(img,None,fx=0.15, fy=0.15, interpolation = cv2.INTER_CUBIC)
         imgs.append( res );
         
-    objDims = create3DModel( imgs, 0 );
+    objDims = findSmallestBox( imgs );
     print( objDims );
