@@ -43,6 +43,7 @@ def findContours( img, knownDimensionsId ) :
     cv2.waitKey(0);
     cv2.destroyAllWindows();'''
 
+    knownRatio = truediv( knownDimensions[ knownDimensionsId ][ 0 ], knownDimensions[ knownDimensionsId ][ 1 ] );
     gray = cv2.cvtColor( img, cv2.COLOR_BGR2GRAY );
 
     '''cv2.imshow('image',gray);
@@ -110,7 +111,7 @@ def findContours( img, knownDimensionsId ) :
     for dim in dims :
         print( truediv( dim[ 0 ], dim[ 1 ] ) );
 
-    if abs( ratios[ 0 ] - cardRatio ) < abs( ratios[ 1 ] - cardRatio ) :
+    if abs( ratios[ 0 ] - knownRatio ) < abs( ratios[ 1 ] - knownRatio ) :
         knownId = 0;
         otherId = 1;
 
@@ -130,7 +131,7 @@ def findContours( img, knownDimensionsId ) :
     print( "width: ", width );
     print( "height: ", height );
     print( "ratio: ", truediv( width, height ) );
-    print( "thr. known ratio: ", truediv( knownDimensions[ knownDimensionsId ][ 0 ], knownDimensions[ knownDimensionsId ][ 1 ] ) );
+    print( "thr. known ratio: ", knownRatio );
     print( "act. known ratio: ", truediv( dims[ knownId ][ 0 ], dims[ knownId ][ 1 ] ) );
 
     cv2.imshow('rect', img);
