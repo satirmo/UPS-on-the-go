@@ -4,7 +4,6 @@ from sqlalchemy import create_engine
 from json import dumps
 from flask.ext.jsonpify import jsonify
 from imageProcessing import *
-import subprocess
 
 app= Flask(__name__)
 
