@@ -180,22 +180,18 @@ def base64ToMat( input, id ) :
     with open( imgname, 'wb') as f :
         f.write( imgdata );
 
+    # COMMENT IF TESTING IN PRODUCTION
+    tmp = cv2.imread( imgname );
+    cv2.imshow('tmp',tmp);
+    cv2.waitKey(0);
+    cv2.destroyAllWindows();
+    # COMMENT IF TESTING IN PRODUCTION
+
     return cv2.imread( imgname );
 
-def findSmallestBox( base64Representation1, base64Representation2 ) :
-    base64Representations = [ base64Representation1, base64Representation2 ];
-
-    imgs = [];
-    imgs.append( base64ToMat( base64Representation1, 0 ) );
-    imgs.append( base64ToMat( base64Representation2, 1 ) );
-
-    # COMMENT IF TESTING IN PRODUCTION
-    for img in imgs :
-        cv2.imshow('init',img);
-        cv2.waitKey(0);
-        cv2.destroyAllWindows();
-    # COMMENT IF TESTING IN PRODUCTION
-
+def findSmallestBox( imgs ) :
+    imgs = parseData( data );
+    
     knownDimensions = 0; # update as necessary
 
     objDims = create3DModel( imgs, knownDimensionsId );
