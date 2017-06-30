@@ -1,5 +1,6 @@
 import cv2;
 import base64;
+import sys;
 import numpy as np;
 from operator import truediv;
 from math import sqrt;
@@ -173,10 +174,13 @@ def fitsInBox( obj, box ) :
     return True;
 
 def base64ToMat( input, id ) :
+    print( "converting image..." );
     imgdata = base64.b64decode( input );
-    imgname = "img0" + str( id ) + ".jpg";
+    imgname = "zim" + str( id ) + ".jpg";
     with open( imgname, 'wb') as f :
         f.write( imgdata );
+
+    return cv2.imread( imgname );
 
 def findSmallestBox( base64Representation1, base64Representation2 ) :
     base64Representations = [ base64Representation1, base64Representation2 ];
@@ -184,6 +188,13 @@ def findSmallestBox( base64Representation1, base64Representation2 ) :
     imgs = [];
     imgs.append( base64ToMat( base64Representation1, 0 ) );
     imgs.append( base64ToMat( base64Representation2, 1 ) );
+
+    # COMMENT IF TESTING IN PRODUCTION
+    for img in imgs :
+        cv2.imshow('init',img);
+        cv2.waitKey(0);
+        cv2.destroyAllWindows();
+    # COMMENT IF TESTING IN PRODUCTION
 
     knownDimensions = 0; # update as necessary
 
@@ -201,7 +212,19 @@ def findSmallestBox( base64Representation1, base64Representation2 ) :
 knownDimensions = [ (2.125, 3.370) ];
 
 if __name__ == "__main__" :
-    imgs = [];
+    lines = 35869;
+
+    s = "";
+
+    for line in sys.stdin :
+        s += line;
+
+    img = base64ToMat( s, 0 );
+    cv2.imshow('init',img);
+    cv2.waitKey(0);
+    cv2.destroyAllWindows();
+
+    '''imgs = [];
 
     for i in range( 1, 3 ) :
         cardRatio = 2.125 / 3.370;
@@ -212,4 +235,4 @@ if __name__ == "__main__" :
         imgs.append( res );
         
     objDims = create3DModel( imgs, 0 );
-    print( objDims );
+    print( objDims );'''
