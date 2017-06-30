@@ -6,8 +6,8 @@ from math import sqrt;
 def getDimensions( points ) :
     hull = cv2.convexHull( points );
     rect = [ x[ 0 ] for x in hull ];
-    print( "0------" );
-    print( rect );
+    # print( "0------" );
+    # print( rect );
     dim = [];
 
     for i in range( 4 ) :
@@ -21,6 +21,8 @@ def getDimensions( points ) :
 
     dim.sort();
 
+    print( "EXTREME DIMS: ", dim );
+
     ret = [];
     
     for i in range( 2 ) :
@@ -29,13 +31,13 @@ def getDimensions( points ) :
 
     ret.sort();
 
-    print( "*----" );
+    '''print( "*----" );
     print( dim );
-    print( ret );
+    print( ret );'''
 
     return ret;
 
-def detectContours( img, knownDimensionsId ) :
+def findContours( img, knownDimensionsId ) :
     # Reduce noise in the image
     '''cv2.imshow('init',img);
     cv2.waitKey(0);
@@ -99,8 +101,8 @@ def detectContours( img, knownDimensionsId ) :
         elif area > rects[ 0 ][ 0 ] :
             rects[ 0 ] = ( area, box );
 
-    print( rects[ 0 ] );
-    print( rects[ 1 ] );
+    # print( rects[ 0 ] );
+    # print( rects[ 1 ] );
 
     dims = [ getDimensions( rect[ 1 ] ) for rect in rects ];
     ratios = [ truediv( x[ 0 ], x[ 1 ] ) for x in dims ];
@@ -127,22 +129,72 @@ def detectContours( img, knownDimensionsId ) :
     height = truediv( knownDimensions[ knownDimensionsId ][ 1 ] * dims[ otherId ][ 1 ], dims[ knownId ][ 1 ] );
     print( "width: ", width );
     print( "height: ", height );
-    
+    print( "ratio: ", truediv( width, height ) );
+    print( "thr. known ratio: ", truediv( knownDimensions[ knownDimensionsId ][ 0 ], knownDimensions[ knownDimensionsId ][ 1 ] ) );
+    print( "act. known ratio: ", truediv( dims[ knownId ][ 0 ], dims[ knownId ][ 1 ] ) );
+
     cv2.imshow('rect', img);
     cv2.waitKey(0);
     cv2.destroyAllWindows();
 
     return ( width, height );
 
+def create3DModel( imgs, knownDimensionsId ) :
+    dims = [ findContours( img, knownDimensionsId ) for img in imgs ];
+
+    minDiff = abs( dims[ 0 ][ 0 ] - dims[ 1 ][ 0 ] );
+    minIds = ( 0, 0 );
+
+    for i in range( 2 ) :
+        for j in range( 2 ) :
+            diff = abs( dims[ 0 ][ i ] - dims[ 1 ][ j ] );
+
+            if diff < minDiff :
+                minDiff = diff;
+                minIds = ( i, j );
+
+    uniqueIds = [ 1-x for x in minIds ];
+
+    boxDims = [ dims[ i ][ uniqueIds[ i ] ] for i in range( 2 ) ];
+
+    sameDim = truediv( dims[ 0 ][ minIds[ 0 ] ] + dims[ 1 ][ minIds[ 1 ] ], 2 );
+    boxDims.append( sameDim );
+    boxDims.sort();
+
+    return boxDims;
+
+def fitsInBox( obj, box ) :
+    for i in range( 3 ) :
+        if( obj[ i ] > box[ i ] ) :
+            return False;
+
+    return True;
+
+def findSmallestBox( imgs, knownDimensionsId ) :
+    objDims = create3DModel( imgs, knownDimensionsId );
+
+    boxDims = [ ( 2, 11, 13 ), ( 3, 11, 16 ), ( 3, 13, 18 ) ];
+    retChar = [ 's', 'm', 'l' ];
+
+    for i in range( 3 ) :
+        if fitsInBox( objDims, boxDims[ i ] ) :
+            return retChar[ i ];
+
+    return "no box found";
+
 knownDimensions = [ (2.125, 3.370) ];
 
+
 if __name__ == "__main__" :
-    cardRatio = 53.98 / 85.60;
-    print( cardRatio );
-    for i in range( 1, 4 ) :
+    imgs = [];
+
+    for i in range( 1, 3 ) :
+        cardRatio = 2.125 / 3.370;
         numStr = "0" + str( i ) if i < 10 else str( i );
-        name = "img" + numStr + ".jpg";
+        name = "yay" + numStr + ".jpg";
         img = cv2.imread( name );
         res = cv2.resize(img,None,fx=0.15, fy=0.15, interpolation = cv2.INTER_CUBIC)
-
-        dimensions = detectContours( res, 0 );
+        imgs.append( res );
+        
+    objDims = create3DModel( imgs, 0 );
+    print( objDims );
