@@ -139,6 +139,11 @@ def findContours( img, id, knownDimensionsId ) :
     print( "thr. known ratio: ", knownRatio );
     print( "act. known ratio: ", truediv( dims[ knownId ][ 0 ], dims[ knownId ][ 1 ] ) );'''
 
+
+    cv2.imshow('initial image 3', img);
+    cv2.waitKey(0);
+    cv2.destroyAllWindows();
+
     name = "imgContour" + str( id ) + ".jpg";
     cv2.imwrite( name, img );
 
@@ -259,6 +264,11 @@ def rotateMatrix( matrix, showImage ) :
     return rotated;
 
 def findSmallestBox( imgs ) :
+    for img in imgs :
+        cv2.imshow('initial image 1',img);
+        cv2.waitKey(0);
+        cv2.destroyAllWindows();
+
     for i in range( len( imgs ) ) :
         semicropped = cropImage( imgs[ i ] );
 
@@ -266,7 +276,7 @@ def findSmallestBox( imgs ) :
 
         r1 = rotateMatrix( semicropped, False );
         cropped = cropImage( r1 );
-        r2 = rotateMatrix( r1, False );
+        r2 = rotateMatrix( cropped, False );
         r3 = rotateMatrix( r2, False );
         r4 = rotateMatrix( r3, False );
 
@@ -280,6 +290,12 @@ def findSmallestBox( imgs ) :
         imgs[ i ] = r4;
         name = "imgOriginal" + str( i ) + ".jpg";
         cv2.imwrite( name, imgs[ i ] );
+
+
+    for img in imgs :
+        cv2.imshow('initial image 2',img);
+        cv2.waitKey(0);
+        cv2.destroyAllWindows();
 
     knownDimensionsId = 0; # update as necessary
 
