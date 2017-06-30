@@ -1,5 +1,5 @@
 # UPS-on-the-go
-Submission for UPS Summer 2017 Hackathon
+Submission for 2017 UPS Summer Hackathon
 
 http://4903f0eb.ngrok.io
 
