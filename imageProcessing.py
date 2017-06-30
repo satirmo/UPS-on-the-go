@@ -39,10 +39,10 @@ def getDimensions( points ) :
 
     return ret;
 
-def findContours( img, knownDimensionsId ) :
-    cv2.imshow('original',img);
+def findContours( img, id, knownDimensionsId ) :
+    '''cv2.imshow('original',img);
     cv2.waitKey(0);
-    cv2.destroyAllWindows();
+    cv2.destroyAllWindows();'''
     # Reduce noise in the image
     '''cv2.imshow('init',img);
     cv2.waitKey(0);
@@ -139,14 +139,13 @@ def findContours( img, knownDimensionsId ) :
     print( "thr. known ratio: ", knownRatio );
     print( "act. known ratio: ", truediv( dims[ knownId ][ 0 ], dims[ knownId ][ 1 ] ) );'''
 
-    cv2.imshow('rect', img);
-    cv2.waitKey(0);
-    cv2.destroyAllWindows();
+    name = "imgContour" + str( id ) + ".jpg";
+    cv2.imwrite( name, img );
 
     return ( width, height );
 
 def create3DModel( imgs, knownDimensionsId ) :
-    dims = [ findContours( img, knownDimensionsId ) for img in imgs ];
+    dims = [ findContours( imgs[ i ], i, knownDimensionsId ) for i in range( len( imgs ) ) ];
 
     minDiff = abs( dims[ 0 ][ 0 ] - dims[ 1 ][ 0 ] );
     minIds = ( 0, 0 );
@@ -179,7 +178,7 @@ def fitsInBox( obj, box ) :
 def base64ToMat( input, id ) :
     print( "converting image..." );
     imgdata = base64.b64decode( input );
-    imgname = "image" + str( id ) + ".jpg";
+    imgname = "imgOriginal" + str( id ) + ".jpg";
     with open( imgname, 'wb') as f :
         f.write( imgdata );
 
@@ -237,18 +236,56 @@ def cropImage( img ) :
     x = l;
     w = r - l - 1;
 
-    print( 0, len( img[ 0 ] )-1, "--->", l, r );
+    '''print( type( img ) );
+    print( y, h, x, w );
+    print( 0, len( img[ 0 ] )-1, "--->", l, r );'''
 
     return img[ y : y + h, x : x + w ];
 
+def rotateMatrix( matrix, showImage ) :
+    '''if flag :
+        print( matrix );'''
+
+    rotated = list(reversed(zip(*matrix)));
+    rotated = np.array( [ list( line ) for line in rotated ] );
+
+    if showImage :
+        cv2.imshow( "rotated", rotated );
+        cv2.waitKey( 0 );
+        cv2.destroyAllWindows();
+        '''print( "--->" );
+        print( rotated );'''
+
+    return rotated;
+
 def findSmallestBox( imgs ) :
     for i in range( len( imgs ) ) :
-        imgs[ i ] = cropImage( imgs[ i ] );
+        semicropped = cropImage( imgs[ i ] );
+
+        tmp = [ [ 1, 2, 3 ], [ 4, 5, 6 ] ];
+
+        r1 = rotateMatrix( semicropped, False );
+        cropped = cropImage( r1 );
+        r2 = rotateMatrix( r1, False );
+        r3 = rotateMatrix( r2, False );
+        r4 = rotateMatrix( r3, False );
+
+        '''rotated = list(reversed(zip(*semicropped)));
+        print( rotated[ 0 ] );
+        cropped = cropImage( rotated );
+
+        for i in range( 3 ) :
+           rotated = list(reversed(zip(*cropped)));'''
+
+        imgs[ i ] = r4;
+        name = "imgOriginal" + str( i ) + ".jpg";
+        cv2.imwrite( name, imgs[ i ] );
 
     knownDimensionsId = 0; # update as necessary
 
     print( "creating 3d model..." );
     objDims = create3DModel( imgs, knownDimensionsId );
+    print( objDims );
     print( "3d model created..." );
 
     boxDims = [ ( 2, 11, 13 ), ( 3, 11, 16 ), ( 3, 13, 18 ) ];
