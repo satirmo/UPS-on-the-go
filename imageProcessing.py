@@ -23,7 +23,7 @@ def getDimensions( points ) :
 
     dim.sort();
 
-    print( "EXTREME DIMS: ", dim );
+    # print( "EXTREME DIMS: ", dim );
 
     ret = [];
     
@@ -83,9 +83,9 @@ def findContours( img, knownDimensionsId ) :
     contourImg, contours, hierarchy = cv2.findContours( thresh, 1, 2 );
     # cv2.drawContours(img, contours, -1, (0,255,0), 3);
 
-    cv2.imshow('threshhhhhh',img);
+    '''cv2.imshow('threshhhhhh',img);
     cv2.waitKey(0);
-    cv2.destroyAllWindows();
+    cv2.destroyAllWindows();'''
 
     rects = [ ( -1, -1 ), ( -1, -1 ) ];
 
@@ -110,8 +110,8 @@ def findContours( img, knownDimensionsId ) :
     dims = [ getDimensions( rect[ 1 ] ) for rect in rects ];
     ratios = [ truediv( x[ 0 ], x[ 1 ] ) for x in dims ];
 
-    for dim in dims :
-        print( truediv( dim[ 0 ], dim[ 1 ] ) );
+    '''for dim in dims :
+        print( truediv( dim[ 0 ], dim[ 1 ] ) );'''
 
     if abs( ratios[ 0 ] - knownRatio ) < abs( ratios[ 1 ] - knownRatio ) :
         knownId = 0;
@@ -124,17 +124,17 @@ def findContours( img, knownDimensionsId ) :
     cv2.drawContours(img,[ rects[ otherId ][ 1 ] ],0,(255,255,0),2);
     cv2.drawContours(img,[ rects[ knownId ][ 1 ] ],0,(0,0,255),2);
 
-    print( knownDimensions[ knownDimensionsId ][ 0 ] );
+    '''print( knownDimensions[ knownDimensionsId ][ 0 ] );
     print( dims[ otherId ][ 0 ] );
-    print( dims[ knownId ][ 0 ] );
+    print( dims[ knownId ][ 0 ] );'''
 
     width = truediv( knownDimensions[ knownDimensionsId ][ 0 ] * dims[ otherId ][ 0 ], dims[ knownId ][ 0 ] );
     height = truediv( knownDimensions[ knownDimensionsId ][ 1 ] * dims[ otherId ][ 1 ], dims[ knownId ][ 1 ] );
-    print( "width: ", width );
+    ''''print( "width: ", width );
     print( "height: ", height );
     print( "ratio: ", truediv( width, height ) );
     print( "thr. known ratio: ", knownRatio );
-    print( "act. known ratio: ", truediv( dims[ knownId ][ 0 ], dims[ knownId ][ 1 ] ) );
+    print( "act. known ratio: ", truediv( dims[ knownId ][ 0 ], dims[ knownId ][ 1 ] ) );'''
 
     cv2.imshow('rect', img);
     cv2.waitKey(0);
@@ -176,25 +176,27 @@ def fitsInBox( obj, box ) :
 def base64ToMat( input, id ) :
     print( "converting image..." );
     imgdata = base64.b64decode( input );
-    imgname = "zim" + str( id ) + ".jpg";
+    imgname = "image" + str( id ) + ".jpg";
     with open( imgname, 'wb') as f :
         f.write( imgdata );
 
     # COMMENT IF TESTING IN PRODUCTION
-    tmp = cv2.imread( imgname );
+    '''tmp = cv2.imread( imgname );
     cv2.imshow('tmp',tmp);
     cv2.waitKey(0);
-    cv2.destroyAllWindows();
+    cv2.destroyAllWindows();'''
     # COMMENT IF TESTING IN PRODUCTION
+
+    print( "converted image..." );
 
     return cv2.imread( imgname );
 
 def findSmallestBox( imgs ) :
-    imgs = parseData( data );
-    
     knownDimensions = 0; # update as necessary
 
+    print( "creating 3d model..." );
     objDims = create3DModel( imgs, knownDimensionsId );
+    print( "3d model created..." );
 
     boxDims = [ ( 2, 11, 13 ), ( 3, 11, 16 ), ( 3, 13, 18 ) ];
     retChar = [ 's', 'm', 'l' ];
@@ -208,7 +210,7 @@ def findSmallestBox( imgs ) :
 knownDimensions = [ (2.125, 3.370) ];
 
 if __name__ == "__main__" :
-    lines = 35869;
+    '''lines = 35869;
 
     s = "";
 
@@ -218,9 +220,9 @@ if __name__ == "__main__" :
     img = base64ToMat( s, 0 );
     cv2.imshow('init',img);
     cv2.waitKey(0);
-    cv2.destroyAllWindows();
+    cv2.destroyAllWindows();'''
 
-    '''imgs = [];
+    imgs = [];
 
     for i in range( 1, 3 ) :
         cardRatio = 2.125 / 3.370;
@@ -231,4 +233,4 @@ if __name__ == "__main__" :
         imgs.append( res );
         
     objDims = create3DModel( imgs, 0 );
-    print( objDims );'''
+    print( objDims );
