@@ -40,6 +40,9 @@ def getDimensions( points ) :
     return ret;
 
 def findContours( img, knownDimensionsId ) :
+    cv2.imshow('original',img);
+    cv2.waitKey(0);
+    cv2.destroyAllWindows();
     # Reduce noise in the image
     '''cv2.imshow('init',img);
     cv2.waitKey(0);
