@@ -317,7 +317,7 @@ if __name__ == "__main__" :
     for i in range( 1, 3 ) :
         cardRatio = 2.125 / 3.370;
         numStr = "0" + str( i ) if i < 10 else str( i );
-        name = "yay" + numStr + ".jpg";
+        name = "plush" + numStr + ".jpg";
         img = cv2.imread( name );
         res = cv2.resize(img,None,fx=0.15, fy=0.15, interpolation = cv2.INTER_CUBIC)
         imgs.append( res );
