@@ -1,4 +1,5 @@
 import cv2;
+import base64;
 import numpy as np;
 from operator import truediv;
 from math import sqrt;
@@ -171,7 +172,21 @@ def fitsInBox( obj, box ) :
 
     return True;
 
-def findSmallestBox( imgs, knownDimensionsId ) :
+def base64ToMat( input, id ) :
+    imgdata = base64.b64decode( input );
+    imgname = "img0" + str( id ) + ".jpg";
+    with open( imgname, 'wb') as f :
+        f.write( imgdata );
+
+def findSmallestBox( base64Representation1, base64Representation2 ) :
+    base64Representations = [ base64Representation1, base64Representation2 ];
+
+    imgs = [];
+    imgs.append( base64ToMat( base64Representation1, 0 ) );
+    imgs.append( base64ToMat( base64Representation2, 1 ) );
+
+    knownDimensions = 0; # update as necessary
+
     objDims = create3DModel( imgs, knownDimensionsId );
 
     boxDims = [ ( 2, 11, 13 ), ( 3, 11, 16 ), ( 3, 13, 18 ) ];
@@ -184,7 +199,6 @@ def findSmallestBox( imgs, knownDimensionsId ) :
     return "no box found";
 
 knownDimensions = [ (2.125, 3.370) ];
-
 
 if __name__ == "__main__" :
     imgs = [];
